@@ -1,0 +1,80 @@
+<button (click)="loadAllArticles()">Show All Articles</button>
+<button (click)="addArticleView()">Add Article</button>
+<button (click)="updateArticleView()">Update Article</button>
+<button (click)="removeArticleView()">Remove Article</button>
+<button (click)="articleByIdView()">Select Article By Id</button>
+<hr/>
+<div [ngSwitch]="task">
+    <ng-template ngSwitchCase = "all">
+        <b>Total Count: {{count$ | async}}</b>
+        <br/><br/><b>Ids:</b> {{articleIds$ | async}}
+        <br/><br/><b>Details:</b>
+        <ul>
+            <li *ngFor="let article of allArticles$ | async">
+                {{article.id}} - {{article.title}} - {{article.category}}   
+            </li>
+        </ul> 
+    </ng-template>
+ 
+    <ng-template ngSwitchCase = "add">
+        <form [formGroup]="articleForm" (ngSubmit)="onFormSubmitForAdd()">
+            <div formArrayName="articlesArray"> 
+             <div *ngFor = "let acl of articlesFormArray.controls; let idx = index" [formGroupName]="idx">
+                <p> <b>New Article: {{idx + 1}}</b> </p>
+                <p> New Id: <input formControlName="id"></p>
+                <p> Title: <input formControlName="title"> </p>
+                <p> Category: <input formControlName="category"> </p>
+                <p> <button type="button" (click)="deleteFormArrayControl(idx)">Delete</button></p>
+             </div>
+            </div>   
+            <button type="button" (click)="addMoreControlForAdd()">Add More Article</button>
+            <hr/>
+            <p *ngIf="articlesFormArray.length > 0"> <button> Submit </button> </p>
+        </form>
+    </ng-template>    
+
+    <ng-template ngSwitchCase = "update">
+        <form [formGroup]="articleForm" (ngSubmit)="onFormSubmitForUpdate()">
+            <div formArrayName="articlesArray"> 
+             <div *ngFor = "let acl of articlesFormArray.controls; let idx = index" [formGroupName]="idx">
+                <p> Id: <input formControlName="id" readonly></p>
+                <p> Update Title: <input formControlName="title"> </p>
+                <p> Update Category: <input formControlName="category"> </p>
+                <p> <button type="button" (click)="deleteFormArrayControl(idx)">Delete</button> </p>
+             </div>
+            </div>   
+            <button type="button" (click)="addMoreControlForUpdate()">Update More Article</button>
+            <hr/>
+            <p *ngIf="articlesFormArray.length > 0"> <button> Update </button> </p>
+        </form>
+    </ng-template>
+
+    <ng-template ngSwitchCase = "remove">
+        <form [formGroup]="articleForm" (ngSubmit)="onFormSubmitForRemove()">
+            <div formArrayName="articlesArray"> 
+                <ul><li *ngFor = "let acl of articlesFormArray.controls; let idx = index" [formGroupName]="idx">
+                   <input type="checkbox" formControlName="chk"/>
+                    {{acl.get('articleData').value.id}}
+                   | {{acl.get('articleData').value.title}}
+                   | {{acl.get('articleData').value.category}}                    
+                    <input type="hidden" formControlName="articleData">
+                </li></ul>
+            </div>   
+            <hr/>
+            <p *ngIf="articlesFormArray.length > 0"> 
+                <button>Remove Selected</button> <button type="button" (click)="clearAllArticles()">Clear All</button> 
+            </p>
+        </form>         
+    </ng-template>
+
+    <ng-template ngSwitchCase = "select">
+        <p> Enter Id: <input [(ngModel)]="articleId"> 
+            <button type="button" (click)="selectArticleById()">Show Article</button> 
+        </p>
+        <ul>
+            <li *ngIf="articleById$ | async as article">
+                {{article.id}} - {{article.title}} - {{article.category}}   
+            </li>
+        </ul>
+    </ng-template>    
+</div> 
